@@ -171,7 +171,7 @@ body, a, p, span, button, input {
     }
     #cards > div > h1 {
         font-family: 'Poppins', sans-serif;
-        font-size: 22px;
+        font-size: 16px;
         text-transform: uppercase;
         letter-spacing: 1.1;
     }
@@ -179,11 +179,11 @@ body, a, p, span, button, input {
         display: flex;
         flex-direction: column;
         justify-content: center;
-        gap: 10px;
+        gap: 0px;
     }
     #cards > div > p {
         font-family: 'Poppins', sans-serif;
-        font-size: 25px;
+        font-size: 21px;
         font-weight: bolder;
     }
     .header {
