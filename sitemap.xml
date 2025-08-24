@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Home Page -->
+  <url>
+    <loc>https://www.fancycodes.shop/</loc>
+    <lastmod>2025-08-24</lastmod>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Search Page -->
+  <url>
+    <loc>https://www.fancycodes.shop/search</loc>
+    <lastmod>2025-08-24</lastmod>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Login Page -->
+  <url>
+    <loc>https://www.fancycodes.shop/login</loc>
+    <lastmod>2025-08-24</lastmod>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Coins Page -->
+  <url>
+    <loc>https://www.fancycodes.shop/coins</loc>
+    <lastmod>2025-08-24</lastmod>
+    <priority>0.7</priority>
+  </url>
+
+</urlset>
