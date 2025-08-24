@@ -1,0 +1,77 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="https://i.ibb.co/DHQfpTF0/32x32.png">
+<link rel="stylesheet" href="loader.css">
+<link rel="stylesheet" href="style.css">
+<div class="header">
+  <input type="text" id="search" placeholder="Search Qr Codes" class="int">
+</div>
+<div id="loader" style="display:none;"><div class="loader"></div></div>
+<div id="cards"></div>
+<div class="mob-space"></div>
+<div id="mob-nav"></div>
+<script>
+  const scriptURL = "https://script.google.com/macros/s/AKfycbzbCV3aYqfVS30k3aB2kVT0AgQvZGYuSPkxhH4uliZki2yDfzFzeCAMtGAx8L48QJd3UA/exec";
+  const searchInput = document.getElementById("search");
+  const cardsContainer = document.getElementById("cards");
+  const loader = document.getElementById("loader");
+
+  async function fetchSearch(term) {
+    loader.style.display = "flex";
+    cardsContainer.innerHTML = "";
+    const res = await fetch(`${scriptURL}?action=searchQRCodes&term=${encodeURIComponent(term)}`);
+    const data = await res.json();
+    loader.style.display = "none";
+    renderCards(data);
+  }
+
+  function renderCards(data) {
+    if (data.length === 0) {
+      cardsContainer.innerHTML = "<p>No results found</p>";
+      return;
+    }
+    data.forEach(item => {
+      const card = document.createElement("div");
+      card.innerHTML = `<img src="${item.image}"><h3>${item.title}</h3>`;
+      card.onclick = () => {
+        localStorage.setItem("product_id", item.productId);
+        const titleSlug = item.title.replace(/\s+/g, "-");
+        window.location.href = `code.html?=${item.productId}/${titleSlug}`;
+      };
+      cardsContainer.appendChild(card);
+    });
+  }
+
+  let typingTimer;
+  searchInput.addEventListener("input", () => {
+    clearTimeout(typingTimer);
+    const term = searchInput.value.trim();
+    if (term.length > 0) {
+      typingTimer = setTimeout(() => fetchSearch(term), 300);
+    } else {
+      cardsContainer.innerHTML = "";
+    }
+  });
+</script>
+<script>
+  document.getElementById('mob-nav').innerHTML = `
+    <div class="mob-nav">
+      <a href="index.html" class="mob-link">
+        <img src="https://www.svgrepo.com/show/529865/shop-minimalistic.svg">
+        <span>Hub</span>
+      </a>
+      <a href="search.html" class="mob-link">
+        <img src="https://www.svgrepo.com/show/522267/search.svg">
+        <span>Search</span>
+      </a>
+      <a href="own.html" class="mob-link">
+        <img src="https://www.svgrepo.com/show/529146/qr-code.svg">
+        <span>Own</span>
+      </a>
+      <a href="coins.html" class="mob-link">
+        <img src="https://www.svgrepo.com/show/264050/coins.svg">
+        <span>Balance</span>
+      </a>
+    </div>
+  `
+</script>

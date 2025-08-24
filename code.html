@@ -1,0 +1,103 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="https://i.ibb.co/DHQfpTF0/32x32.png">
+<link rel="stylesheet" href="loader.css">
+<link rel="stylesheet" href="style.css">
+<div id="loader"><div class="loader"></div></div>
+<div id="balance"></div>
+<div id="product"></div>
+<h2 class="h-text" style="margin: 20px 25px;">You May Like This</h2>
+<div id="suggestions"></div>
+<script>
+  const scriptURL = "https://script.google.com/macros/s/AKfycbwTuqzL5rqVY91bgWogJkJiZxwhSxX0clyF12noFzjHtd5Un_CVdi-TrCF8skjkdh7e/exec";
+  const loader = document.getElementById("loader");
+  const productDiv = document.getElementById("product");
+  const suggestionsDiv = document.getElementById("suggestions");
+  const balanceDiv = document.getElementById("balance");
+
+  const urlParams = window.location.search;
+  let productId = null;
+  if (urlParams.startsWith("?=")) {
+    const parts = urlParams.substring(2).split("/");
+    productId = parts[0];
+    localStorage.setItem("product_id", productId);
+  } else {
+    productId = localStorage.getItem("product_id");
+  }
+
+  const userId = localStorage.getItem("qr_local");
+
+  async function fetchBalance() {
+    const res = await fetch(`${scriptURL}?action=getUser&userId=${encodeURIComponent(userId)}`);
+    const data = await res.json();
+    balanceDiv.innerHTML = `<div class="balance-area"><img src="https://www.svgrepo.com/show/471229/coins-stacked-02.svg"> ₹${data.balance}</div>`;
+  }
+
+  async function fetchProduct() {
+    loader.style.display = "flex";
+    const res = await fetch(`${scriptURL}?action=getProduct&productId=${encodeURIComponent(productId)}&userId=${encodeURIComponent(userId)}`);
+    const data = await res.json();
+    loader.style.display = "none";
+    if (!data.title) {
+      productDiv.innerText = "Product not found";
+      return;
+    }
+    let buttonHTML = data.purchased ? `<button id="createBtn" class="btn">Create</button>` : `<button id="buyBtn" class="btn">Buy Now</button>`;
+    productDiv.innerHTML = `
+      <img src="${data.image}">
+      <h1>${data.title}</h1>
+      <p>Price: <strong>₹${data.amount}</strong></p>
+      <p>${data.description}</p>
+      ${buttonHTML}
+    `;
+    if (data.purchased) {
+      document.getElementById("createBtn").addEventListener("click", () => {
+        localStorage.setItem("create", productId);
+        location.href = `create.html?=${productId}/${data.title.replace(/\s+/g, "-")}`;
+      });
+    } else {
+      document.getElementById("buyBtn").addEventListener("click", () => {
+        if (confirm(`Did you really want to buy this ${data.title}?`)) {
+          buyProduct();
+        }
+      });
+    }
+  }
+
+  async function fetchSuggestions() {
+    const res = await fetch(`${scriptURL}?action=getSuggestions&excludeId=${encodeURIComponent(productId)}`);
+    const data = await res.json();
+    suggestionsDiv.innerHTML = "";
+    data.forEach(row => {
+      const title = row[0];
+      const img = row[1];
+      const amount = row[2];
+      const pid = row[4];
+      const card = document.createElement("div");
+      card.innerHTML = `<img src="${img}" style="border-radius: 12px;"><h3>${title}</h3><p>₹${amount}</p>`;
+      card.addEventListener("click", () => {
+        localStorage.setItem("product_id", pid);
+        location.href = `?=${pid}/${title.replace(/\s+/g, "-")}`;
+      });
+      suggestionsDiv.appendChild(card);
+    });
+  }
+
+  async function buyProduct() {
+    loader.style.display = "flex";
+    const res = await fetch(`${scriptURL}?action=buyProduct&productId=${encodeURIComponent(productId)}&userId=${encodeURIComponent(userId)}`);
+    const result = await res.json();
+    loader.style.display = "none";
+    alert(result.message);
+    fetchBalance();
+    fetchProduct();
+  }
+
+  if (productId && userId) {
+    fetchBalance();
+    fetchProduct();
+    fetchSuggestions();
+  } else {
+    location.href = "login.html";
+  }
+</script>

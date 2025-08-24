@@ -1,0 +1,74 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="https://i.ibb.co/DHQfpTF0/32x32.png">
+<link rel="stylesheet" href="loader.css">
+<link rel="stylesheet" href="style.css">
+<style>
+  @media only screen and (min-width: 786px) {
+    * {
+      overflow: hidden;
+    }
+    body {
+      width: 100vw;
+      height: 100vh;
+    }
+    #loginForm {
+      flex-direction: row;
+    }
+  }
+</style>
+<div id="loader"><div class="loader"></div></div>
+<form id="loginForm">
+  <div class="image">
+    <img src="images/signin.png" alt="signin">
+  </div>
+  <div class="form">
+    <div class="text">
+      <h1>Login</h1>
+      <span>Please login to continue.</span>
+    </div>
+    <input type="number" name="Phone" placeholder="Mobile Number" class="int" required>
+    <input type="password" name="Password" placeholder="Password" class="int" required>
+    <button type="submit" class="btn">Sign in</button>
+    <div class="dont">
+      <span>Don't have account? <a href="signup.html">Signup</a></span>
+    </div>
+  </div>
+</form>
+<p id="message"></p>
+<script>
+document.getElementById("loader").style.display = "none";
+if(localStorage.getItem("qr_local")){
+  if(localStorage.getItem("product_id")){
+    location.href = "code.html?=" + localStorage.getItem("product_id");
+  } else {
+    location.href = "index.html";
+  }
+}
+const scriptURL = "https://script.google.com/macros/s/AKfycbyzYkPJSMxdSkf4Qco_3QrQ2DiQrbW-ax21LmIlGuq0EfhzT_qZAygTUGV6m16KyJP1dQ/exec";
+document.getElementById("loginForm").addEventListener("submit", e => {
+  e.preventDefault();
+  document.getElementById("loader").style.display = "flex";
+  const phone = e.target.Phone.value;
+  const password = e.target.Password.value;
+  fetch(scriptURL + "?loginPhone=" + encodeURIComponent(phone) + "&loginPassword=" + encodeURIComponent(password))
+    .then(res => res.text())
+    .then(uid => {
+      if(uid && uid !== "false"){
+        localStorage.setItem("qr_local", uid);
+        if(localStorage.getItem("product_id")){
+          location.href = "code.html?=" + localStorage.getItem("product_id");
+        } else {
+          location.href = "index.html";
+        }
+      } else {
+        document.getElementById("loader").style.display = "none";
+        alert("Invalid phone or password.");
+      }
+    })
+    .catch(() => {
+      document.getElementById("loader").style.display = "none";
+      document.getElementById("message").innerText = "Error logging in.";
+    });
+});
+</script>

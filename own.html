@@ -1,0 +1,100 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="https://i.ibb.co/DHQfpTF0/32x32.png">
+<link rel="stylesheet" href="loader.css">
+<link rel="stylesheet" href="style.css">
+<style>
+  @media only screen and (max-width: 600px) {
+    #cards {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: center;
+        gap: 25px;
+        padding: 20px 10px;
+    }
+    #cards > div > img {
+        width: 155px;
+        height: 155px;
+        border-radius: 12px 12px 0 0;
+    }
+    #cards > div > h3 {
+      margin: 0 0 8px 10px;
+      font-size: 15px;
+      letter-spacing: 1.2;
+      font-weight: 600;
+    }
+    #cards > div {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border-radius: 12px 12px 0 0;
+      box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    }
+  }
+</style>
+<div id="loader"><div class="loader"></div></div>
+<div id="cards"></div>
+<div class="mob-space"></div>
+<div id="mob-nav"></div>
+<script>
+  const scriptURL = "https://script.google.com/macros/s/AKfycbwxwFHROJnXp6RVZie5bBSREcQa6xQZzCxNuXg7W5kAl_etL4RPObmXy3nLNwn21TkkoA/exec";
+  const loader = document.getElementById("loader");
+  const cardsDiv = document.getElementById("cards");
+  const userId = localStorage.getItem("qr_local");
+
+  async function fetchMyQRCodes() {
+    loader.style.display = "flex";
+    const res = await fetch(`${scriptURL}?action=getMyQRCodes&userId=${encodeURIComponent(userId)}`);
+    const data = await res.json();
+    loader.style.display = "none";
+    cardsDiv.innerHTML = "";
+    if (!data.length) {
+      cardsDiv.innerHTML = `<p>No Qrcode Purchased</p><button id="storeBtn">Go to Store</button>`;
+      document.getElementById("storeBtn").addEventListener("click", () => {
+        location.href = "index.html";
+      });
+      return;
+    }
+    data.forEach(row => {
+      const title = row[0];
+      const img = row[1];
+      const pid = row[4];
+      const card = document.createElement("div");
+      card.innerHTML = `<img src="${img}"><h3>${title}</h3>`;
+      card.addEventListener("click", () => {
+        localStorage.setItem("create", pid);
+        location.href = `create.html?=${pid}/${title.replace(/\s+/g, "-")}`;
+      });
+      cardsDiv.appendChild(card);
+    });
+  }
+
+  if (userId) {
+    fetchMyQRCodes();
+  } else {
+    location.href = "login.html";
+  }
+</script>
+<script>
+  document.getElementById('mob-nav').innerHTML = `
+    <div class="mob-nav">
+      <a href="index.html" class="mob-link">
+        <img src="https://www.svgrepo.com/show/529865/shop-minimalistic.svg">
+        <span>Hub</span>
+      </a>
+      <a href="search.html" class="mob-link">
+        <img src="https://www.svgrepo.com/show/532555/search.svg">
+        <span>Search</span>
+      </a>
+      <a href="own.html" class="mob-link">
+        <img src="https://www.svgrepo.com/show/525479/qr-code.svg">
+        <span>Own</span>
+      </a>
+      <a href="coins.html" class="mob-link">
+        <img src="https://www.svgrepo.com/show/264050/coins.svg">
+        <span>Balance</span>
+      </a>
+    </div>
+  `
+</script>

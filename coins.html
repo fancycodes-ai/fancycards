@@ -1,0 +1,74 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="https://i.ibb.co/DHQfpTF0/32x32.png">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="loader.css">
+<div id="loader"><div class="loader"></div></div>
+<div class="body">
+  <div class="main">
+    <input type="number" id="amount" placeholder="Enter Amount" required class="int">
+    <div id="modes" class="modes">
+      <div class="mode" data-mode="Phone Pe">Phone Pe</div>
+      <div class="mode" data-mode="GooglePay">G - Pay</div>
+      <div class="mode" data-mode="Others">Others</div>
+    </div>
+    <button id="nextBtn" class="btn">Next</button>
+  </div>
+</div>
+<div class="mob-space"></div>
+<div id="mob-nav"></div>
+<script>
+  document.getElementById("loader").style.display = "none";
+  let selectedMode = "";
+  document.querySelectorAll(".mode").forEach(div => {
+    div.addEventListener("click", () => {
+      document.querySelectorAll(".mode").forEach(d => {d.style.background = "";});
+      div.style.background = "#046baf";
+      selectedMode = div.getAttribute("data-mode");
+    });
+  });
+  const scriptURL = "https://script.google.com/macros/s/AKfycbyN9LyIFZB_GL3Tck0dPfCW4VllT3pwC2PZyQ4pVcsNPfE1eGj2EzqsHkEdGD84Oef3EQ/exec";
+  document.getElementById("nextBtn").addEventListener("click", () => {
+    const amount = document.getElementById("amount").value;
+    if(!amount || !selectedMode){
+      alert("Enter amount and select payment mode");
+      return;
+    }
+    document.getElementById("loader").style.display = "flex";
+    fetch(scriptURL + "?getUPI=true")
+      .then(res => res.json())
+      .then(data => {
+        localStorage.setItem("amount", amount);
+        localStorage.setItem("payment_mode", selectedMode);
+        localStorage.setItem("merchant_name", data.merchant);
+        localStorage.setItem("upi_id", data.upi);
+        location.href = "buy.html";
+      })
+      .catch(() => {
+        document.getElementById("loader").style.display = "none";
+        alert("Error fetching UPI details.");
+      });
+  });
+</script>
+<script>
+  document.getElementById('mob-nav').innerHTML = `
+    <div class="mob-nav">
+      <a href="index.html" class="mob-link">
+        <img src="https://www.svgrepo.com/show/529865/shop-minimalistic.svg">
+        <span>Hub</span>
+      </a>
+      <a href="search.html" class="mob-link">
+        <img src="https://www.svgrepo.com/show/532555/search.svg">
+        <span>Search</span>
+      </a>
+      <a href="own.html" class="mob-link">
+        <img src="https://www.svgrepo.com/show/529146/qr-code.svg">
+        <span>Own</span>
+      </a>
+      <a href="coins.html" class="mob-link">
+        <img src="https://www.svgrepo.com/show/263955/coins-cash.svg">
+        <span>Balance</span>
+      </a>
+    </div>
+  `
+</script>

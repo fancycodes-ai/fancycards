@@ -1,0 +1,466 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="https://i.ibb.co/DHQfpTF0/32x32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="loader.css">
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary-color: #046baf;
+    --text-color: #333;
+    --border-color: #ddd;
+    --background-color: #f7f9fc;
+    --white: #fff;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+
+  body {
+    font-family: 'Raleway', sans-serif;
+    background-color: var(--background-color);
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: var(--text-color);
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .container {
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    max-width: 400px;
+    width: 90%;
+    overflow: hidden;
+    position: relative;
+    padding: 0;
+  }
+
+  .header {
+    background-color: var(--primary-color);
+    color: var(--white);
+    text-align: center;
+    padding: 1rem 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .content {
+    padding: 1.5rem;
+  }
+
+  .summary-section {
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .summary-item .label {
+    font-weight: 500;
+    color: #666;
+    display: flex;
+    align-items: center;
+  }
+
+  .summary-item .value {
+    font-weight: 600;
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .summary-row .summary-item {
+    flex: 1;
+    display: block;
+  }
+
+  .summary-row .label {
+    margin-bottom: 0.25rem;
+  }
+
+  .upi-qr-section {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .qr-code {
+    width: 240px;
+    height: 240px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .form-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-section h4 {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+  }
+
+  .file-input-container {
+    position: relative;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+  }
+
+  .file-input-container:hover {
+    border-color: var(--primary-color);
+  }
+
+  #screenshot {
+    opacity: 0;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+  }
+
+  .file-placeholder {
+    padding: 1rem;
+    color: #888;
+    font-size: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .file-placeholder svg {
+    margin-bottom: 0.5rem;
+  }
+
+  .utr-input {
+    margin-top: 1rem;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+    padding: 0.75rem;
+  }
+
+  input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+  }
+
+  .button-section {
+    text-align: center;
+    padding: 0 1.5rem 1.5rem 1.5rem;
+  }
+
+  #doneBtn {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    width: 100%;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+  }
+
+  #doneBtn:hover {
+    background-color: #303f9f;
+  }
+
+  .message {
+    text-align: center;
+    margin-top: 1rem;
+    color: #d32f2f;
+    font-weight: 500;
+    min-height: 20px;
+  }
+  @media (max-width: 600px) {
+    .container {
+      border-radius: 0;
+      box-shadow: none;
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+    }
+
+    .proof-row {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    #doneBtn {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      border: none;
+      border-radius: 0;
+    }
+    .button-section {
+      padding: 0;
+    }
+    .active {
+      margin-bottom: 0;
+    }
+  }
+
+  @media (min-width: 601px) {
+    .container {
+      max-width: 650px;
+      padding: 0;
+      height: 92vh;
+    }
+
+    .content {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      padding: 1.5rem;
+    }
+
+    /*.header {
+      padding: 1.5rem 0;
+      font-size: 1.75rem;
+    }
+    */
+    .top-section-container, .bottom-section-container {
+      display: flex;
+      justify-content: space-between;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .summary-section, .upi-qr-section, .form-section {
+      flex: 1;
+    }
+
+    .summary-section {
+      padding: 1.5rem;
+    }
+
+    .summary-item {
+      font-size: 1rem;
+    }
+
+    .summary-row {
+      gap: 2rem;
+    }
+
+    .qr-code {
+      width: 200px;
+      height: 200px;
+      border: none;
+      cursor: none;
+    }
+
+    .proof-row {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .or-divider {
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: #999;
+      white-space: nowrap;
+    }
+
+    input[type="text"] {
+      padding: 1rem;
+    }
+
+    #doneBtn {
+      /*padding: 1rem 2rem;*/
+      border-radius: 125px;
+      font-size: 1.1rem;
+    }
+  }
+</style>
+<div class="container">
+  <div class="header">Fancy Codes</div>
+  <div class="content">
+    <div class="top-section-container">
+      <div class="summary-section">
+        <div id="summary">
+          <div class="summary-row">
+            <div class="summary-item">
+              <span class="label">Payment Mode</span>
+              <span class="value" id="payment-mode"></span>
+            </div>
+            <div class="summary-item">
+              <span class="label">Merchant</span>
+              <span class="value" id="merchant-name"></span>
+            </div>
+          </div>
+          <div class="summary-row">
+            <div class="summary-item">
+              <span class="label">UPI ID</span>
+              <span class="value" id="upi-id"></span>
+            </div>
+            <div class="summary-item">
+              <span class="label">Amount</span>
+              <span class="value" id="amount"></span>
+            </div>
+          </div>
+          <div class="summary-item">
+            <span class="label">Transaction ID</span>
+            <span class="value" id="txn-id"></span>
+          </div>
+        </div>
+      </div>
+      <div class="upi-qr-section">
+        <img id="qr" class="qr-code" alt="UPI QR">
+      </div>
+    </div>
+    <div class="bottom-section-container">
+      <div class="form-section">
+        <h4>Enter UTR</h4>
+        <div class="utr-input">
+          <input type="text" id="utr" placeholder="Enter UTR (optional)">
+        </div>
+      </div>
+      <div class="or-divider">OR</div>
+      <div class="form-section active">
+        <h4>Upload Screenshot</h4>
+        <div class="file-input-container">
+          <input type="file" id="screenshot" accept="image/*">
+          <div class="file-placeholder">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            <span>Tap to upload screenshot</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="button-section">
+    <button id="doneBtn">Done</button>
+  </div>
+  <p id="msg" class="message"></p>
+</div>
+<div id="loader"><div class="loader"></div></div>
+<script>
+const scriptURL = "https://script.google.com/macros/s/AKfycbwgluqFtOm1Hh4VqkIcZdH782KVgeIUH9k2tV3lskBc3iTp3YfDddpyIdL52oa8u2gygg/exec";
+const IMGBB_KEY = "d9d0d3fba74e5d10316ecbb996dc07a9";
+const loader = document.getElementById("loader");
+loader.style.display = "none";
+const amount = localStorage.getItem("amount");
+const paymentMode = localStorage.getItem("payment_mode");
+const merchant = localStorage.getItem("merchant_name");
+const upi = localStorage.getItem("upi_id");
+const userId = localStorage.getItem("qr_local");
+if (!amount || !paymentMode || !merchant || !upi || !userId) {
+  alert("Missing details. Please start again.");
+}
+function randomTxnId() {
+  let s = "";
+  for (let i = 0; i < 14; i++) {
+    s += Math.floor(Math.random() * 10);
+  }
+  return s;
+}
+const txnId = randomTxnId();
+document.getElementById("payment-mode").innerText = paymentMode;
+document.getElementById("merchant-name").innerText = merchant;
+document.getElementById("upi-id").innerText = upi;
+document.getElementById("amount").innerText = `₹${amount}`;
+document.getElementById("txn-id").innerText = txnId;
+const upiLink = `upi://pay?pa=${encodeURIComponent(upi)}&pn=${encodeURIComponent(merchant)}&am=${encodeURIComponent(amount)}`;
+const qrURL = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(upiLink)}`;
+document.getElementById("qr").src = qrURL;
+async function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result.split(",")[1]);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+async function uploadToImgbb(file) {
+  const b64 = await fileToBase64(file);
+  const fd = new FormData();
+  fd.append("key", IMGBB_KEY);
+  fd.append("image", b64);
+  const res = await fetch("https://api.imgbb.com/1/upload", { method: "POST", body: fd });
+  const json = await res.json();
+  if (json && json.data && json.data.url) return json.data.url;
+  throw new Error("Upload failed");
+}
+document.getElementById("doneBtn").addEventListener("click", async () => {
+  if (!amount || !paymentMode || !merchant || !upi || !userId) return;
+  loader.style.display = "flex";
+  const file = document.getElementById("screenshot").files[0];
+  const utr = document.getElementById("utr").value.trim();
+  try {
+    let proof = "";
+    if (file) {
+      proof = await uploadToImgbb(file);
+    } else if (utr) {
+      proof = utr;
+    } else {
+      loader.style.display = "none";
+      alert("Please upload a screenshot or enter UTR.");
+      return;
+    }
+    const fd = new FormData();
+    fd.append("UserID", userId);
+    fd.append("Mode", paymentMode);
+    fd.append("Txn", txnId);
+    fd.append("Proof", proof);
+    fd.append("Amount", amount);
+    const res = await fetch(scriptURL, { method: "POST", body: fd });
+    const txt = await res.text();
+    loader.style.display = "none";
+    if ((txt || "").toLowerCase().includes("success")) {
+      Object.keys(localStorage).forEach(k => { if (k !== "qr_local") localStorage.removeItem(k); });
+      location.href = "submit.html";
+    } else {
+      alert("Failed to save payment.");
+    }
+  } catch (err) {
+    loader.style.display = "none";
+    alert("Error: " + err.message);
+  }
+});
+document.getElementById('screenshot').addEventListener('change', function() {
+  const placeholder = document.querySelector('.file-placeholder span');
+  if (this.files.length > 0) {
+    placeholder.textContent = this.files[0].name;
+  } else {
+    placeholder.textContent = "Tap to upload screenshot";
+  }
+});
+if (userId) {
+    fetchMyQRCodes();
+  } else {
+    location.href = "login.html";
+  }
+</script>

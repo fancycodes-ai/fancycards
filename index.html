@@ -1,0 +1,104 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="https://i.ibb.co/DHQfpTF0/32x32.png">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="loader.css">
+<style>
+  @media only screen and (min-width: 786px) {
+    .header {
+      position: absolute;
+      right: 20px;
+      top: 15px;
+    }
+  }
+  @media only screen and (max-width: 600px) {
+    #balance {
+      position: absolute;
+      right: 15px;
+      margin: 0;
+      top: 20px;
+    }
+  }
+</style>
+<div id="loader"><div class="loader"></div></div>
+<div id="sidebar"></div>
+<div class="header">
+  <div id="balance"></div>
+  <div id="greet"></div>
+</div>
+<div id="cards"></div>
+<div class="mob-space"></div>
+<div id="mob-nav"></div>
+<script>
+const scriptURL = "https://script.google.com/macros/s/AKfycbz1nVYevqLjMwhshgIPDDa6rMXZrqGRD0LmosR4nWUbvVGuANIusUixp9KmfldrxSznUA/exec";
+const loader = document.getElementById("loader");
+const cards = document.getElementById("cards");
+const greetDiv = document.getElementById("greet");
+const balanceDiv = document.getElementById("balance");
+const userId = localStorage.getItem("qr_local");
+
+function getGreeting(){
+  const hour = new Date().getHours();
+  if(hour < 12) return "Good Morning 🌅";
+  if(hour < 17) return "Good Afternoon ☀️";
+  if(hour < 20) return "Good Evening 🌇";
+  return "Good Night 🌙";
+}
+
+async function fetchUser(){
+  loader.style.display = "flex";
+  if(userId){
+    const res = await fetch(`${scriptURL}?action=getUser&userId=${encodeURIComponent(userId)}`);
+    const data = await res.json();
+    greetDiv.innerHTML = `<strong>${getGreeting()},<strong> <span>${data.name}</span>`;
+    balanceDiv.innerHTML = `<div class="balance-area"><img src="https://www.svgrepo.com/show/471229/coins-stacked-02.svg"> ₹${data.balance}</div>`;
+  } else {
+    greetDiv.innerText = getGreeting();
+    balanceDiv.innerHTML = `<span style="cursor:pointer;" onclick="location.href='login.html'">🔑 Login</span>`;
+  }
+}
+
+async function fetchData(){
+  const res = await fetch(scriptURL + "?action=getQRCodes");
+  const data = await res.json();
+  loader.style.display = "none";
+  data.forEach(row=>{
+    const title = row[0];
+    const img = row[1];
+    const amount = row[2];
+    const productId = row[4];
+    const card = document.createElement("div");
+    card.innerHTML = `<img src="${img}"><h1>${title}</h1><p>₹${amount}</p>`;
+    card.addEventListener("click", ()=>{
+      localStorage.setItem("product_id", productId);
+      const urlTitle = title.replace(/\s+/g, "-");
+      location.href = `code.html?=${productId}/${urlTitle}`;
+    });
+    cards.appendChild(card);
+  });
+}
+
+fetchUser().then(fetchData);
+</script>
+<script>
+  document.getElementById('mob-nav').innerHTML = `
+    <div class="mob-nav">
+      <a href="index.html" class="mob-link">
+        <img src="https://www.svgrepo.com/show/460104/store.svg">
+        <span>Hub</span>
+      </a>
+      <a href="search.html" class="mob-link">
+        <img src="https://www.svgrepo.com/show/532555/search.svg">
+        <span>Search</span>
+      </a>
+      <a href="own.html" class="mob-link">
+        <img src="https://www.svgrepo.com/show/529146/qr-code.svg">
+        <span>Own</span>
+      </a>
+      <a href="coins.html" class="mob-link">
+        <img src="https://www.svgrepo.com/show/264050/coins.svg">
+        <span>Balance</span>
+      </a>
+    </div>
+  `
+</script>

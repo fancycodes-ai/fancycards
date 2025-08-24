@@ -1,0 +1,78 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="https://i.ibb.co/DHQfpTF0/32x32.png">
+<link rel="stylesheet" href="loader.css">
+<link rel="stylesheet" href="style.css">
+<style>
+  @media only screen and (min-width: 786px) {
+    * {
+      overflow: hidden;
+    }
+    body {
+      width: 100vw;
+      height: 100vh;
+    }
+    #userForm {
+      flex-direction: row-reverse;
+    }
+  }
+</style>
+<div id="loader"><div class="loader"></div></div>
+<form id="userForm">
+  <div class="image">
+    <img src="images/signup.png" alt="singup">
+  </div>
+  <div class="form">
+    <div class="text">
+      <h1>Register</h1>
+      <span>Please register to continue.</span>
+    </div>
+    <input type="text" name="Name" placeholder="Enter Name" required class="int">
+    <input type="tel" name="Phone" placeholder="Enter Phone" required class="int">
+    <input type="password" name="Password" placeholder="Enter Password" required class="int"> 
+    <input type="text" name="Upi" placeholder="Enter UPI ID" required class="int">
+    <button type="submit" class="btn">Sign up</button>
+    <div class="dont">
+      <span>Already have account? <a href="login.html">Sign in</a></span>
+    </div>
+  </div>
+</form>
+<p id="message"></p>
+<script>
+  document.getElementById("loader").style.display = "none";
+  if(localStorage.getItem("qr_local")) location.href = "index.html";
+  const scriptURL = "https://script.google.com/macros/s/AKfycbzAqLfsTpCXRDwQ-pSrg5ZBG1U5Cf9gMtgfhe-R57GM-zu0ujMKxNdZ5KGEbFK435dUJQ/exec";
+  document.getElementById("userForm").addEventListener("submit", e => {
+    e.preventDefault();
+    document.getElementById("loader").style.display = "flex";
+    const form = new FormData(e.target);
+    fetch(scriptURL + "?checkPhone=" + encodeURIComponent(form.get("Phone")))
+      .then(res => res.text())
+      .then(exists => {
+        if(exists === "true"){
+          document.getElementById("loader").style.display = "none";
+          alert("Phone number already registered.");
+        } else {
+          const uid = generateID();
+          form.append("UniqueID", uid);
+          form.append("SheetName", "Users");
+          fetch(scriptURL, { method: "POST", body: form })
+            .then(res => res.text())
+            .then(() => {
+              localStorage.setItem("qr_local", uid);
+              location.href = "index.html";
+            })
+            .catch(() => {
+              document.getElementById("loader").style.display = "none";
+              document.getElementById("message").innerText = "Error saving data.";
+            });
+        }
+      });
+  });
+  function generateID() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < 12; i++) result += chars.charAt(Math.floor(Math.random() * chars.length));
+    return result;
+  }
+</script>

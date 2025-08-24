@@ -1,0 +1,247 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="https://i.ibb.co/DHQfpTF0/32x32.png">
+<link rel="stylesheet" href="loader.css">
+<link rel="stylesheet" href="style.css">
+<style>
+  #loader {
+    display: flex;
+  }
+  @media only screen and (max-width: 600px) {
+    #main {
+      flex-direction: column;
+    }
+    #inputArea {
+      display: flex;
+      flex-direction: column;
+    }
+    #inputArea > input {
+      padding: 12px 18px;
+      border-radius: 125px;
+      border: none;
+      outline: none;
+      background: #dddd;
+      letter-spacing: 1.2;
+      color: #000000;
+      font-weight: 500;
+    }
+    .rider {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 10px 15px;
+    }
+    .area65 {
+      display: flex;
+      padding: 10px 20px;
+      align-items: center;
+      justify-content: space-around;
+    }
+    #youMayLikeList > div > img {
+      border-radius: 12px;
+    }
+    #youMayLikeList > div > strong {
+      font-size: 17px;
+      letter-spacing: 1.2;
+      font-weight: 600;
+    }
+    #youMayLike > h3 {
+      margin: 10px 25px;
+      font-size: 24px;
+      letter-spacing: 1.2;
+      font-family: 'Poppins' , sans-serif;
+    }
+  }
+</style>
+<div id="loader"><div class="loader"></div></div>
+<div id="main">
+  <div class="area65">
+    <div class="mode-btn" data-mode="url">URL</div>
+    <div class="mode-btn" data-mode="text">Text</div>
+    <div class="mode-btn" data-mode="emoji">Emoji</div>
+    <div class="mode-btn" data-mode="password">Password</div>
+    <div class="mode-btn" data-mode="amount">Amount</div>
+  </div>
+  <div class="rider">
+    <div id="inputArea"></div>
+    <button id="generateBtn" class="btn">Download</button>
+  </div>
+  <div id="youMayLike" style="margin-top:20px;display:none;">
+    <h3>You May Try This</h3>
+    <div id="youMayLikeList"></div>
+  </div>
+</div>
+<script>
+  const scriptURL = "https://script.google.com/macros/s/AKfycbx9tcz8SX_ge5UEQiE1gIcQcUV4vgK_68dJ0O_0oZXIiqry5TFyYZLy_WQE1jE0bA5WvA/exec";
+  const loader = document.getElementById("loader");
+  const main = document.getElementById("main");
+  const generateBtn = document.getElementById("generateBtn");
+  const inputArea = document.getElementById("inputArea");
+  const youMayLike = document.getElementById("youMayLike");
+  const youMayLikeList = document.getElementById("youMayLikeList");
+
+  let selectedMode = "amount";
+  let upiId = "";
+  let bgUrl = "";
+  let productId = "";
+  let productTitle = "";
+  let userId = localStorage.getItem("qr_local");
+  let downloadValue = "";
+
+  const params = window.location.search;
+  if (params.includes("?=")) {
+    productId = params.split("?=")[1].split("/")[0];
+    localStorage.setItem("create", productId);
+  } else {
+    productId = localStorage.getItem("create");
+  }
+
+  async function checkOwnership() {
+    const res = await fetch(`${scriptURL}?action=checkOwnership&productId=${encodeURIComponent(productId)}&userId=${encodeURIComponent(userId)}`);
+    const data = await res.json();
+    if (!data.owned) {
+      localStorage.setItem("product_id", productId);
+      location.href = `code.html?=${productId}/${data.title.replace(/\s+/g, "-")}`;
+    } else {
+      productTitle = data.title;
+      await getDetails();
+      await loadYouMayLike();
+      loader.style.display = "none";
+      main.style.display = "flex";
+      setDefaultMode();
+    }
+  }
+
+  async function getDetails() {
+    const res = await fetch(`${scriptURL}?action=getCreateDetails&productId=${encodeURIComponent(productId)}&userId=${encodeURIComponent(userId)}`);
+    const data = await res.json();
+    bgUrl = data.background;
+    upiId = data.upi;
+  }
+
+  async function loadYouMayLike() {
+    const res = await fetch(`${scriptURL}?action=getOwnedList&userId=${encodeURIComponent(userId)}&exclude=${encodeURIComponent(productId)}`);
+    const list = await res.json();
+    if (list.length > 0) {
+      youMayLike.style.display = "block";
+      youMayLikeList.innerHTML = "";
+      list.slice(0, 12).forEach(item => {
+        const div = document.createElement("div");
+        div.style.cursor = "pointer";
+        div.innerHTML = `<img src="${item.img}"><strong>${item.title}</strong>`;
+        div.onclick = () => {
+          localStorage.setItem("create", item.pid);
+          location.href = `create.html?=${item.pid}/${item.title.replace(/\s+/g, "-")}`;
+        };
+        youMayLikeList.appendChild(div);
+      });
+    }
+  }
+
+  function setDefaultMode() {
+    selectedMode = "amount";
+    document.querySelectorAll(".mode-btn").forEach(btn => {
+      if (btn.dataset.mode === "amount") btn.style.background = "#ddd", btn.style.padding = "5px 15px"; 
+      else btn.style.background = "";
+    });
+    renderInputArea();
+  }
+
+  document.querySelectorAll(".mode-btn").forEach(btn => {
+    btn.onclick = () => {
+      selectedMode = btn.dataset.mode;
+      document.querySelectorAll(".mode-btn").forEach(b => b.style.background = "");
+      btn.style.background = "#ddd" , btn.style.padding = "5px 15px";
+      renderInputArea();
+    };
+  });
+
+  function renderInputArea() {
+    inputArea.innerHTML = "";
+    if (selectedMode === "url") {
+      inputArea.innerHTML = `<input type="text" id="modeInput" placeholder="Enter URL">`;
+    } else if (selectedMode === "text") {
+      inputArea.innerHTML = `<input type="text" id="modeInput" placeholder="Enter Text">`;
+    } else if (selectedMode === "emoji") {
+      inputArea.innerHTML = `<input type="text" id="modeInput" placeholder="Enter Emoji">`;
+    } else if (selectedMode === "password") {
+      inputArea.innerHTML = `<input type="text" id="userField" placeholder="USERID"><br><input type="text" id="passField" placeholder="Password">`;
+    } else if (selectedMode === "amount") {
+      inputArea.innerHTML = `<input type="number" id="modeInput" placeholder="Enter Amount">`;
+    }
+  }
+
+  generateBtn.addEventListener("click", () => {
+    let qrData = "";
+    if (selectedMode === "password") {
+      const u = document.getElementById("userField").value;
+      const p = document.getElementById("passField").value;
+      if (!u || !p) return alert("Fill both fields");
+      qrData = `${u}:${p}`;
+      downloadValue = "password_qr";
+    } else if (selectedMode === "amount") {
+      const amt = document.getElementById("modeInput").value;
+      if (!amt) return alert("Enter amount");
+      qrData = `upi://pay?pa=${upiId}&am=${amt}`;
+      downloadValue = amt;
+    } else if (selectedMode === "url") {
+      const val = document.getElementById("modeInput").value;
+      if (!val) return alert("Enter value");
+      qrData = val;
+      downloadValue = val.slice(0, 8);
+    } else {
+      const val = document.getElementById("modeInput").value;
+      if (!val) return alert("Enter value");
+      qrData = val;
+      downloadValue = val;
+    }
+    loader.style.display = "flex";
+    const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrData)}`;
+    const bgImage = new Image();
+    bgImage.crossOrigin = "anonymous";
+    bgImage.onload = function() {
+      const qrImage = new Image();
+      qrImage.crossOrigin = "anonymous";
+      qrImage.onload = function() {
+        const size = 150;
+        const pad = 15;
+        const totalSize = size + pad * 2;
+        const mergedCanvas = document.createElement("canvas");
+        mergedCanvas.width = 280;
+        mergedCanvas.height = 400;
+        const mCtx = mergedCanvas.getContext("2d");
+        mCtx.drawImage(bgImage, 0, 0, 280, 400);
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = totalSize;
+        tempCanvas.height = totalSize;
+        const tCtx = tempCanvas.getContext("2d");
+        tCtx.fillStyle = "#fff";
+        tCtx.beginPath();
+        tCtx.moveTo(pad, 0);
+        tCtx.lineTo(totalSize - pad, 0);
+        tCtx.quadraticCurveTo(totalSize, 0, totalSize, pad);
+        tCtx.lineTo(totalSize, totalSize - pad);
+        tCtx.quadraticCurveTo(totalSize, totalSize, totalSize - pad, totalSize);
+        tCtx.lineTo(pad, totalSize);
+        tCtx.quadraticCurveTo(0, totalSize, 0, totalSize - pad);
+        tCtx.lineTo(0, pad);
+        tCtx.quadraticCurveTo(0, 0, pad, 0);
+        tCtx.closePath();
+        tCtx.fill();
+        tCtx.drawImage(qrImage, pad, pad, size, size);
+        const qrCanvasLeft = (280 - totalSize) / 2;
+        const qrCanvasTop = (400 - totalSize) / 2;
+        mCtx.drawImage(tempCanvas, qrCanvasLeft, qrCanvasTop);
+        const link = document.createElement("a");
+        link.download = `${downloadValue}.png`;
+        link.href = mergedCanvas.toDataURL();
+        link.click();
+        loader.style.display = "none";
+      };
+      qrImage.src = qrApiUrl;
+    };
+    bgImage.src = bgUrl;
+  });
+
+  checkOwnership();
+</script>
