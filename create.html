@@ -210,7 +210,17 @@
         mergedCanvas.width = 280;
         mergedCanvas.height = 400;
         const mCtx = mergedCanvas.getContext("2d");
-        mCtx.drawImage(bgImage, 0, 0, 280, 400);
+
+        const blurCanvas = document.createElement("canvas");
+        blurCanvas.width = 280;
+        blurCanvas.height = 400;
+        const bCtx = blurCanvas.getContext("2d");
+        bCtx.filter = "blur(3px)";
+        bCtx.drawImage(bgImage, 0, 0, 280, 400);
+        mCtx.drawImage(blurCanvas, 0, 0);
+        mCtx.fillStyle = "rgba(0,0,0,0.2)";
+        mCtx.fillRect(0, 0, 280, 400);
+
         const tempCanvas = document.createElement("canvas");
         tempCanvas.width = totalSize;
         tempCanvas.height = totalSize;
