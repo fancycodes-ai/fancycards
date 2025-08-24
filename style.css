@@ -165,8 +165,8 @@ body, a, p, span, button, input {
         font-weight: 500;
     }
     #cards > div > img {
-        width: 155px;
-        height: 155px;
+        width: 140px;
+        height: 200px;
         border-radius: 12px;
     }
     #cards > div > h1 {
